@@ -1,0 +1,978 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  <title>LinkNest 數位內容收藏管理系統</title>
+
+  <!-- Bootstrap 5 -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+
+  <!-- Font Awesome Icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+
+  <style>
+    .edit-icon {
+        color: #999;
+        cursor: pointer;
+        font-size: 18px;
+    }
+
+    .edit-icon:hover {
+        color: #2f2a25;
+    }
+
+    .youtube-thumb {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+
+    .youtube-preview {
+      position: relative;
+      width: 100%;
+      height: 100%;
+    }
+
+    .youtube-play-icon {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      background-color: rgba(0,0,0,0.65);
+      color: white;
+      width: 58px;
+      height: 42px;
+      border-radius: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 20px;
+    }
+
+    body {
+      background-color: #f4efe8;
+      font-family: "Noto Sans TC", "Microsoft JhengHei", sans-serif;
+    }
+
+    .navbar {
+      background-color: #2f2a25;
+    }
+
+    .hero {
+      background-color: #fffdf8;
+      border-radius: 24px;
+      padding: 32px;
+      box-shadow: 0 8px 24px rgba(0,0,0,0.06);
+    }
+
+    .stat-card {
+      border: none;
+      border-radius: 20px;
+      background-color: #fffdf8;
+      box-shadow: 0 6px 16px rgba(0,0,0,0.06);
+    }
+
+    .search-box {
+      background-color: #fffdf8;
+      border-radius: 20px;
+      border: none;
+      box-shadow: 0 6px 16px rgba(0,0,0,0.06);
+    }
+
+    .category-btn.active {
+      background-color: #2f2a25 !important;
+      color: white !important;
+      border-color: #2f2a25 !important;
+    }
+
+    .preview-card {
+      border: none;
+      border-radius: 18px;
+      overflow: hidden;
+      background-color: #fffdf9;
+      box-shadow: 0 6px 18px rgba(0,0,0,0.08);
+      transition: 0.2s;
+    }
+
+    .preview-card:hover {
+      transform: translateY(-4px);
+    }
+
+    .preview-area {
+      height: 130px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 44px;
+      color: #111;
+    }
+
+    .preview-area iframe {
+      width: 100%;
+      height: 100%;
+      border: 0;
+    }
+
+    .preview-body {
+      padding: 18px;
+    }
+
+    .preview-footer {
+      border-top: 1px solid #e7dfd7;
+      padding: 12px 18px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .category-pill {
+      display: inline-block;
+      padding: 5px 12px;
+      border-radius: 999px;
+      font-size: 13px;
+      font-weight: 600;
+      margin-bottom: 12px;
+    }
+
+    .open-link {
+      color: #e2572c;
+      text-decoration: none;
+      font-weight: 600;
+      font-size: 14px;
+    }
+
+    .open-link:hover {
+      text-decoration: underline;
+    }
+
+    .delete-icon {
+      color: #bbb;
+      cursor: pointer;
+      font-size: 18px;
+    }
+
+    .delete-icon:hover {
+      color: #dc3545;
+    }
+
+    .favorite-icon {
+      cursor: pointer;
+      font-size: 18px;
+      color: #f4b400;
+    }
+
+    .not-favorite-icon {
+      cursor: pointer;
+      font-size: 18px;
+      color: #c9c9c9;
+    }
+
+    .domain-text {
+      font-size: 14px;
+      color: #777;
+    }
+
+    .note-text {
+      color: #777;
+      font-size: 15px;
+    }
+
+    footer {
+      color: #777;
+      font-size: 14px;
+    }
+  </style>
+</head>
+
+<body>
+
+  <!-- 導覽列 -->
+  <nav class="navbar navbar-expand-lg navbar-dark">
+    <div class="container">
+      <a class="navbar-brand fw-bold" href="#">LinkNest</a>
+      <span class="navbar-text text-white">
+        數位內容收藏管理系統
+      </span>
+    </div>
+  </nav>
+
+  <div class="container my-4">
+
+    <!-- 系統介紹 -->
+    <section class="hero mb-4">
+      <div class="row align-items-center">
+        <div class="col-md-8">
+          <h1 class="fw-bold mb-3">集中整理你的數位收藏</h1>
+          <p class="text-muted mb-0">
+            LinkNest 可以協助使用者收藏 Instagram、Threads、YouTube、新聞、購物網站、
+            學習資源與其他瀏覽器網址，並透過分類、搜尋、標籤與重要標記快速管理。
+          </p>
+        </div>
+
+        <div class="col-md-4 text-md-end mt-3 mt-md-0">
+          <button class="btn btn-dark btn-lg" data-bs-toggle="modal" data-bs-target="#addModal">
+            <i class="fa-solid fa-plus me-1"></i> 新增收藏
+          </button>
+        </div>
+      </div>
+    </section>
+
+    <!-- 統計卡片 -->
+    <section class="row g-3 mb-4">
+      <div class="col-6 col-md-3">
+        <div class="card stat-card p-3">
+          <h6 class="text-muted">總收藏</h6>
+          <h3 id="totalCount" class="fw-bold">0</h3>
+        </div>
+      </div>
+
+      <div class="col-6 col-md-3">
+        <div class="card stat-card p-3">
+          <h6 class="text-muted">重要收藏</h6>
+          <h3 id="favoriteCount" class="fw-bold">0</h3>
+        </div>
+      </div>
+
+      <div class="col-6 col-md-3">
+        <div class="card stat-card p-3">
+          <h6 class="text-muted">學習資源</h6>
+          <h3 id="studyCount" class="fw-bold">0</h3>
+        </div>
+      </div>
+
+      <div class="col-6 col-md-3">
+        <div class="card stat-card p-3">
+          <h6 class="text-muted">社群貼文</h6>
+          <h3 id="socialCount" class="fw-bold">0</h3>
+        </div>
+      </div>
+    </section>
+
+    <!-- 搜尋與分類 -->
+    <section class="search-box p-3 mb-4">
+      <div class="row g-3 align-items-center">
+
+        <div class="col-md-5">
+          <input type="text" id="searchInput" class="form-control" placeholder="搜尋標題、平台、分類、標籤或備註...">
+        </div>
+
+        <div class="col-md-7">
+          <div class="d-flex flex-wrap gap-2" id="categoryButtons">
+            <button class="btn btn-outline-dark btn-sm category-btn active" data-category="全部">全部</button>
+            <button class="btn btn-outline-dark btn-sm category-btn" data-category="社群貼文">社群</button>
+            <button class="btn btn-outline-dark btn-sm category-btn" data-category="影音內容">影音</button>
+            <button class="btn btn-outline-dark btn-sm category-btn" data-category="學習資源">學習</button>
+            <button class="btn btn-outline-dark btn-sm category-btn" data-category="購物清單">購物</button>
+            <button class="btn btn-outline-dark btn-sm category-btn" data-category="新聞">新聞</button>
+            <button class="btn btn-outline-dark btn-sm category-btn" data-category="旅遊">旅遊</button>
+            <button class="btn btn-outline-dark btn-sm category-btn" data-category="工具網站">工具</button>
+            <button class="btn btn-outline-dark btn-sm category-btn" data-category="活動資訊">活動</button>
+
+            <button class="btn btn-dark btn-sm" id="addCategoryBtn" type="button">
+                <i class="fa-solid fa-plus"></i>
+            </button>
+          </div>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- 收藏列表 -->
+    <section>
+      <div class="d-flex justify-content-between align-items-center mb-3">
+        <h4 class="fw-bold mb-0">我的收藏</h4>
+        <span class="text-muted" id="resultText">目前顯示 0 筆</span>
+      </div>
+
+      <div id="bookmarkList" class="row g-4">
+        <!-- JavaScript 會自動產生收藏卡片 -->
+      </div>
+    </section>
+
+  </div>
+
+  <!-- 新增收藏 Modal -->
+  <div class="modal fade" id="addModal" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered">
+      <div class="modal-content rounded-4">
+
+        <div class="modal-header">
+          <h5 class="modal-title fw-bold">新增數位收藏</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+        </div>
+
+        <div class="modal-body">
+          <form id="bookmarkForm">
+
+            <div class="mb-3">
+              <label class="form-label">收藏標題</label>
+              <input type="text" id="titleInput" class="form-control" placeholder="例如：Bootstrap 官方文件">
+            </div>
+
+            <div class="mb-3">
+              <label class="form-label">網址 URL</label>
+              <input type="url" id="urlInput" class="form-control" placeholder="https://example.com">
+            </div>
+
+            <div class="mb-3">
+              <label class="form-label">平台來源</label>
+              <select id="platformInput" class="form-select">
+                <option value="Instagram">Instagram</option>
+                <option value="Threads">Threads</option>
+                <option value="YouTube">YouTube</option>
+                <option value="TikTok">TikTok</option>
+                <option value="Google">Google</option>
+                <option value="新聞網站">新聞網站</option>
+                <option value="購物網站">購物網站</option>
+                <option value="Blog">Blog / 文章</option>
+                <option value="工具網站">工具網站</option>
+                <option value="一般網站">一般網站</option>
+              </select>
+            </div>
+
+            <div class="mb-3">
+              <label class="form-label">內容分類</label>
+              <select id="categoryInput" class="form-select">
+                <option value="社群貼文">社群貼文</option>
+                <option value="影音內容">影音內容</option>
+                <option value="學習資源">學習資源</option>
+                <option value="購物清單">購物清單</option>
+                <option value="新聞">新聞</option>
+                <option value="旅遊">旅遊</option>
+                <option value="工具網站">工具網站</option>
+                <option value="活動資訊">活動資訊</option>
+                <option value="靈感素材">靈感素材</option>
+              </select>
+            </div>
+
+            <div class="mb-3">
+              <label class="form-label">標籤</label>
+              <input type="text" id="tagsInput" class="form-control" placeholder="例如：前端, 作業, 靈感">
+              <div class="form-text">請用逗號分隔多個標籤。</div>
+            </div>
+
+            <div class="mb-3">
+              <label class="form-label">備註</label>
+              <textarea id="noteInput" class="form-control" rows="3" placeholder="可以記錄這個連結的用途或重點"></textarea>
+            </div>
+
+            <div class="form-check">
+              <input class="form-check-input" type="checkbox" id="favoriteInput">
+              <label class="form-check-label" for="favoriteInput">
+                設為重要收藏
+              </label>
+            </div>
+
+          </form>
+        </div>
+
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">取消</button>
+          <button type="button" class="btn btn-dark" id="saveBtn">儲存收藏</button>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+  <!-- 編輯收藏 Modal -->
+  <div class="modal fade" id="editModal" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered">
+      <div class="modal-content rounded-4">
+
+        <div class="modal-header">
+          <h5 class="modal-title fw-bold">編輯收藏內容</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+        </div>
+
+        <div class="modal-body">
+          <form id="editForm">
+
+            <input type="hidden" id="editIdInput">
+
+            <div class="mb-3">
+              <label class="form-label">收藏標題</label>
+              <input type="text" id="editTitleInput" class="form-control">
+            </div>
+
+            <div class="mb-3">
+              <label class="form-label">網址 URL</label>
+              <input type="url" id="editUrlInput" class="form-control">
+            </div>
+
+            <div class="mb-3">
+              <label class="form-label">平台來源</label>
+              <select id="editPlatformInput" class="form-select">
+                <option value="Instagram">Instagram</option>
+                <option value="Threads">Threads</option>
+                <option value="YouTube">YouTube</option>
+                <option value="TikTok">TikTok</option>
+                <option value="Google">Google</option>
+                <option value="新聞網站">新聞網站</option>
+                <option value="購物網站">購物網站</option>
+                <option value="Blog">Blog / 文章</option>
+                <option value="工具網站">工具網站</option>
+                <option value="一般網站">一般網站</option>
+              </select>
+            </div>
+
+            <div class="mb-3">
+              <label class="form-label">內容分類</label>
+              <select id="editCategoryInput" class="form-select">
+                <option value="社群貼文">社群貼文</option>
+                <option value="影音內容">影音內容</option>
+                <option value="學習資源">學習資源</option>
+                <option value="購物清單">購物清單</option>
+                <option value="新聞">新聞</option>
+                <option value="旅遊">旅遊</option>
+                <option value="工具網站">工具網站</option>
+                <option value="活動資訊">活動資訊</option>
+                <option value="靈感素材">靈感素材</option>
+              </select>
+            </div>
+
+            <div class="mb-3">
+              <label class="form-label">標籤</label>
+              <input type="text" id="editTagsInput" class="form-control">
+              <div class="form-text">請用逗號分隔多個標籤。</div>
+            </div>
+
+            <div class="mb-3">
+              <label class="form-label">備註</label>
+              <textarea id="editNoteInput" class="form-control" rows="3"></textarea>
+            </div>
+
+            <div class="form-check">
+              <input class="form-check-input" type="checkbox" id="editFavoriteInput">
+              <label class="form-check-label" for="editFavoriteInput">
+                設為重要收藏
+              </label>
+            </div>
+
+          </form>
+        </div>
+
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">取消</button>
+          <button type="button" class="btn btn-dark" id="updateBtn">儲存修改</button>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+  <footer class="text-center py-4">
+    LinkNest © 2026｜個人數位內容收藏與分類管理系統
+  </footer>
+
+  <!-- Bootstrap JS -->
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+
+  <script>
+    // 預設收藏資料
+    let bookmarks = JSON.parse(localStorage.getItem("bookmarks")) || [
+      {
+        id: 1,
+        title: "登山旅遊 Vlog",
+        url: "https://www.youtube.com/watch?v=dQw4w9WgXcQ",
+        platform: "YouTube",
+        category: "旅遊",
+        tags: ["登山", "旅行", "影片"],
+        note: "下次去登山的靈感來源",
+        favorite: true
+      },
+      {
+        id: 2,
+        title: "熱門話題",
+        url: "https://www.threads.net/",
+        platform: "Threads",
+        category: "社群貼文",
+        tags: ["社群", "話題"],
+        note: "每天滑一下",
+        favorite: false
+      },
+      {
+        id: 3,
+        title: "MOMO 購物",
+        url: "https://www.momoshop.com.tw/",
+        platform: "購物網站",
+        category: "購物清單",
+        tags: ["購物", "生活用品"],
+        note: "每日特賣不能錯過",
+        favorite: false
+      },
+      {
+        id: 4,
+        title: "聯合新聞網",
+        url: "https://udn.com/",
+        platform: "新聞網站",
+        category: "新聞",
+        tags: ["新聞", "時事"],
+        note: "早上看時事",
+        favorite: true
+      },
+      {
+        id: 5,
+        title: "Bootstrap 官方文件",
+        url: "https://getbootstrap.com/",
+        platform: "工具網站",
+        category: "學習資源",
+        tags: ["前端", "Bootstrap", "作業"],
+        note: "期中網頁排版可以參考",
+        favorite: true
+      },
+      {
+        id: 6,
+        title: "Canva 設計工具",
+        url: "https://www.canva.com/",
+        platform: "工具網站",
+        category: "工具網站",
+        tags: ["簡報", "設計", "工具"],
+        note: "可以用來做報告封面和介面原型",
+        favorite: false
+      }
+    ];
+
+    let currentCategory = "全部";
+
+    const bookmarkList = document.getElementById("bookmarkList");
+    const searchInput = document.getElementById("searchInput");
+    const resultText = document.getElementById("resultText");
+
+    const totalCount = document.getElementById("totalCount");
+    const favoriteCount = document.getElementById("favoriteCount");
+    const studyCount = document.getElementById("studyCount");
+    const socialCount = document.getElementById("socialCount");
+
+    const saveBtn = document.getElementById("saveBtn");
+
+    function openEditModal(id) {
+        const item = bookmarks.find(bookmark => bookmark.id === id);
+
+        if (!item) {
+            alert("找不到這筆收藏資料！");
+            return;
+        }
+
+        document.getElementById("editIdInput").value = item.id;
+        document.getElementById("editTitleInput").value = item.title;
+        document.getElementById("editUrlInput").value = item.url;
+        document.getElementById("editPlatformInput").value = item.platform;
+        document.getElementById("editCategoryInput").value = item.category;
+        document.getElementById("editTagsInput").value = item.tags.join(", ");
+        document.getElementById("editNoteInput").value = item.note;
+        document.getElementById("editFavoriteInput").checked = item.favorite;
+
+        const editModal = new bootstrap.Modal(document.getElementById("editModal"));
+        editModal.show();
+    }
+
+    function updateBookmark() {
+        const id = Number(document.getElementById("editIdInput").value);
+        const title = document.getElementById("editTitleInput").value.trim();
+        const url = document.getElementById("editUrlInput").value.trim();
+        const platform = document.getElementById("editPlatformInput").value;
+        const category = document.getElementById("editCategoryInput").value;
+
+        const tags = document.getElementById("editTagsInput").value
+           .split(",")
+           .map(tag => tag.trim())
+           .filter(tag => tag !== "");
+        
+        const note = document.getElementById("editNoteInput").value.trim();
+        const favorite = document.getElementById("editFavoriteInput").checked;
+
+        if (title === "" || url === "") {
+            alert("請至少填寫收藏標題和網址！");
+            return;
+        }
+
+        if (!url.startsWith("http://") && !url.startsWith("https://")) {
+            alert("網址請以 http:// 或 https:// 開頭！");
+            return;
+        }
+
+        bookmarks = bookmarks.map(item => {
+            if (item.id === id) {
+                return {
+                  ...item,
+                  title,
+                  url,
+                  platform,
+                  category,
+                  tags,
+                  note,
+                  favorite
+                };
+            }
+
+            return item;
+        });
+
+        saveToLocalStorage();
+        renderBookmarks();
+
+        const modal = bootstrap.Modal.getOrCreateInstance(document.getElementById("editModal"));
+        modal.hide();
+    }
+
+    function saveToLocalStorage() {
+      localStorage.setItem("bookmarks", JSON.stringify(bookmarks));
+    }
+
+    function getCategoryStyle(category) {
+      const styles = {
+        "旅遊": {
+          bg: "#ffe2b8",
+          pillBg: "#fff4df",
+          pillColor: "#f08a24",
+          icon: "fa-suitcase-rolling"
+        },
+        "社群貼文": {
+          bg: "#ffd1d1",
+          pillBg: "#fff0f0",
+          pillColor: "#e74c4c",
+          icon: "fa-user-group"
+        },
+        "購物清單": {
+          bg: "#cfe4ff",
+          pillBg: "#eef6ff",
+          pillColor: "#2f73d8",
+          icon: "fa-bag-shopping"
+        },
+        "新聞": {
+          bg: "#dec8ff",
+          pillBg: "#f3eaff",
+          pillColor: "#7b55d9",
+          icon: "fa-newspaper"
+        },
+        "影音內容": {
+          bg: "#d9d9d9",
+          pillBg: "#f1f1f1",
+          pillColor: "#555",
+          icon: "fa-play"
+        },
+        "學習資源": {
+          bg: "#d8f3dc",
+          pillBg: "#ecfff1",
+          pillColor: "#2c9c5b",
+          icon: "fa-book"
+        },
+        "靈感素材": {
+          bg: "#ffe0f0",
+          pillBg: "#fff0f8",
+          pillColor: "#d94f91",
+          icon: "fa-lightbulb"
+        },
+        "工具網站": {
+          bg: "#e2e3ff",
+          pillBg: "#f0f1ff",
+          pillColor: "#5b6cff",
+          icon: "fa-screwdriver-wrench"
+        },
+        "活動資訊": {
+          bg: "#fff0c2",
+          pillBg: "#fff8df",
+          pillColor: "#d99a00",
+          icon: "fa-calendar-days"
+        }
+      };
+
+      return styles[category] || {
+        bg: "#eeeeee",
+        pillBg: "#f7f7f7",
+        pillColor: "#666",
+        icon: "fa-link"
+      };
+    }
+
+    function getDomain(url) {
+      try {
+        return new URL(url).hostname.replace("www.", "");
+      } catch {
+        return "未知網站";
+      }
+    }
+
+    function getYouTubeId(url) {
+      try {
+        const urlObj = new URL(url);
+        let videoId = "";
+
+        if (urlObj.hostname.includes("youtube.com")) {
+          videoId = urlObj.searchParams.get("v");
+        }
+
+        if (urlObj.hostname.includes("youtu.be")) {
+          videoId = urlObj.pathname.slice(1);
+        }
+
+        return videoId || null;
+      } catch {
+        return null;
+      }
+    }
+
+    function renderBookmarks() {
+      bookmarkList.innerHTML = "";
+
+      const keyword = searchInput.value.trim().toLowerCase();
+
+      const filteredBookmarks = bookmarks.filter(item => {
+        const matchCategory = currentCategory === "全部" || item.category === currentCategory;
+
+        const searchText = `
+          ${item.title}
+          ${item.platform}
+          ${item.category}
+          ${item.tags.join(" ")}
+          ${item.note}
+        `.toLowerCase();
+
+        const matchKeyword = searchText.includes(keyword);
+
+        return matchCategory && matchKeyword;
+      });
+
+      resultText.textContent = `目前顯示 ${filteredBookmarks.length} 筆`;
+
+      if (filteredBookmarks.length === 0) {
+        bookmarkList.innerHTML = `
+          <div class="col-12">
+            <div class="alert alert-light text-center border rounded-4">
+              查無符合條件的收藏，試試看其他關鍵字或分類。
+            </div>
+          </div>
+        `;
+        updateStats();
+        return;
+      }
+
+      filteredBookmarks.forEach(item => {
+        const style = getCategoryStyle(item.category);
+        const domain = getDomain(item.url);
+        const youtubeId = getYouTubeId(item.url);
+
+        const card = document.createElement("div");
+        card.className = "col-md-6";
+
+        let previewContent = "";
+
+        if (youtubeId) {
+          previewContent = `
+            <div class="youtube-preview">
+              <img 
+                src="https://img.youtube.com/vi/${youtubeId}/hqdefault.jpg" 
+                class="youtube-thumb"
+                alt="${item.title}">
+              <div class="youtube-play-icon">
+                <i class="fa-solid fa-play"></i>
+              </div>
+            </div>
+          `;
+        } else {
+        previewContent = `
+          <i class="fa-solid ${style.icon}"></i>
+        `;
+        }
+
+        card.innerHTML = `
+          <div class="preview-card h-100">
+            <div class="preview-area" style="background-color: ${style.bg};">
+              ${previewContent}
+            </div>
+
+            <div class="preview-body">
+              <div class="d-flex justify-content-between align-items-start">
+                <span 
+                  class="category-pill" 
+                  style="background-color: ${style.pillBg}; color: ${style.pillColor};">
+                  <i class="fa-solid ${style.icon} me-1"></i>${item.category}
+                </span>
+
+                <i 
+                  class="fa-solid fa-star ${item.favorite ? "favorite-icon" : "not-favorite-icon"}" 
+                  onclick="toggleFavorite(${item.id})">
+                </i>
+              </div>
+
+              <h5 class="fw-bold mb-2">${item.platform} — ${item.title}</h5>
+
+              <p class="note-text mb-2">
+                ${item.note || "沒有備註"}
+              </p>
+
+              <div class="mb-2">
+                ${item.tags.map(tag => `<span class="badge rounded-pill text-bg-light me-1">#${tag}</span>`).join("")}
+              </div>
+
+              <p class="domain-text mb-0">
+                <i class="fa-solid fa-link me-1"></i>${domain}
+              </p>
+            </div>
+
+            <div class="preview-footer">
+              <a href="${item.url}" target="_blank" class="open-link">
+                開啟連結 <i class="fa-solid fa-arrow-right ms-1"></i>
+              </a>
+
+              <div class="d-flex gap-3">
+                <i class="fa-solid fa-pen edit-icon" onclick="openEditModal(${item.id})"></i>
+                <i class="fa-regular fa-trash-can delete-icon" onclick="deleteBookmark(${item.id})"></i>
+              </div>
+            </div>
+          </div>
+        `;
+
+        bookmarkList.appendChild(card);
+      });
+
+      updateStats();
+    }
+
+    function updateStats() {
+      totalCount.textContent = bookmarks.length;
+      favoriteCount.textContent = bookmarks.filter(item => item.favorite).length;
+      studyCount.textContent = bookmarks.filter(item => item.category === "學習資源").length;
+      socialCount.textContent = bookmarks.filter(item => item.category === "社群貼文").length;
+    }
+
+    function addBookmark() {
+      const title = document.getElementById("titleInput").value.trim();
+      const url = document.getElementById("urlInput").value.trim();
+      const platform = document.getElementById("platformInput").value;
+      const category = document.getElementById("categoryInput").value;
+
+      const tags = document.getElementById("tagsInput").value
+        .split(",")
+        .map(tag => tag.trim())
+        .filter(tag => tag !== "");
+
+      const note = document.getElementById("noteInput").value.trim();
+      const favorite = document.getElementById("favoriteInput").checked;
+
+      if (title === "" || url === "") {
+        alert("請至少填寫收藏標題和網址！");
+        return;
+      }
+
+      if (!url.startsWith("http://") && !url.startsWith("https://")) {
+        alert("網址請以 http:// 或 https:// 開頭！");
+        return;
+      }
+
+      const newBookmark = {
+        id: Date.now(),
+        title,
+        url,
+        platform,
+        category,
+        tags,
+        note,
+        favorite
+      };
+
+      bookmarks.push(newBookmark);
+      saveToLocalStorage();
+      renderBookmarks();
+
+      document.getElementById("bookmarkForm").reset();
+
+      const modal = bootstrap.Modal.getInstance(document.getElementById("addModal"));
+      modal.hide();
+    }
+
+    function deleteBookmark(id) {
+      const confirmDelete = confirm("確定要刪除這筆收藏嗎？");
+
+      if (confirmDelete) {
+        bookmarks = bookmarks.filter(item => item.id !== id);
+        saveToLocalStorage();
+        renderBookmarks();
+      }
+    }
+
+    function toggleFavorite(id) {
+      bookmarks = bookmarks.map(item => {
+        if (item.id === id) {
+          return { ...item, favorite: !item.favorite };
+        }
+        return item;
+      });
+
+      saveToLocalStorage();
+      renderBookmarks();
+    }
+
+    function bindCategoryButtons() {
+        document.querySelectorAll(".category-btn").forEach(button => {
+            button.addEventListener("click", function () {
+                document.querySelectorAll(".category-btn").forEach(btn => {
+                    btn.classList.remove("active");
+                });
+
+                this.classList.add("active");
+                currentCategory = this.dataset.category;
+                renderBookmarks();
+            });
+        });
+    }
+
+    bindCategoryButtons();
+
+    document.getElementById("addCategoryBtn").addEventListener("click", function () {
+        const newCategory = prompt("請輸入新的收藏分類名稱：");
+
+        if (!newCategory || newCategory.trim() === "") {
+            return;
+        }
+
+        const categoryName = newCategory.trim();
+
+        const exists = Array.from(document.querySelectorAll(".category-btn"))
+           .some(btn => btn.dataset.category === categoryName);
+        
+        if (exists) {
+            alert("這個分類已經存在！");
+            return;
+        }
+
+        const newButton = document.createElement("button");
+        newButton.className = "btn btn-outline-dark btn-sm category-btn";
+        newButton.dataset.category = categoryName;
+        newButton.textContent = categoryName;
+
+        const addBtn = document.getElementById("addCategoryBtn");
+        document.getElementById("categoryButtons").insertBefore(newButton, addBtn);
+
+        const categoryInput = document.getElementById("categoryInput");
+        const option = document.createElement("option");
+        option.value = categoryName;
+        option.textContent = categoryName;
+        categoryInput.appendChild(option);
+
+        const editCategoryInput = document.getElementById("editCategoryInput");
+        if (editCategoryInput) {
+            const editOption = document.createElement("option");
+            editOption.value = categoryName;
+            editOption.textContent = categoryName;
+            editCategoryInput.appendChild(editOption);
+        }
+
+        bindCategoryButtons();
+    });
+
+    searchInput.addEventListener("input", renderBookmarks);
+
+    saveBtn.addEventListener("click", addBookmark);
+
+    const updateBtn = document.getElementById("updateBtn");
+    updateBtn.addEventListener("click", updateBookmark);
+
+    renderBookmarks();
+  </script>
+
+</body>
+</html>
