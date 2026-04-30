@@ -1070,20 +1070,22 @@
         card.innerHTML = `
           <div class="preview-card h-100">
 
+            <div class="card-star-area">
+              <i 
+                class="fa-solid fa-star ${item.favorite ? "favorite-icon" : "not-favorite-icon"}" 
+                onclick="toggleFavorite(${item.id})">
+              </i>
+            </div>
+
             <div class="card-main-area">
 
               <div class="card-info-area">
-                <div class="d-flex justify-content-between align-items-start mb-2">
+                <div class="mb-2">
                   <span 
                     class="category-pill" 
                     style="background-color: ${style.pillBg}; color: ${style.pillColor};">
                     <i class="fa-solid ${style.icon} me-1"></i>${item.category}
                   </span>
-
-                  <i 
-                    class="fa-solid fa-star ${item.favorit/e ? "favorite-icon" : "not-favorite-icon"}" 
-                    onclick="toggleFavorite(${item.id})">
-                  </i>
                 </div>
 
                 <h5 class="fw-bold mb-2">${item.platform} — ${item.title}</h5>
@@ -1117,7 +1119,7 @@
             </div>
 
           </div>
-        `;
+        `;        
 
         bookmarkList.appendChild(card);
       });
