@@ -13,6 +13,190 @@
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
 
   <style>
+    .preview-card {
+      position: relative;
+    }
+
+    .card-star-area {
+      position: absolute;
+      top: 18px;
+      right: 20px;
+      z-index: 5;
+    }
+
+    .card-main-area {
+      padding: 18px 22px;
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      gap: 18px;
+      min-height: 220px;
+    }
+
+    .card-info-area {
+      flex: 1;
+      min-width: 0;
+    }
+
+    .card-thumb-area {
+      width: 170px;
+      height: 115px;
+      border-radius: 14px;
+      overflow: hidden;
+      flex-shrink: 0;
+      margin-top: 36px;
+      background-color: #eeeeee;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 6px 14px rgba(0,0,0,0.18);
+      position: relative;
+    }
+
+    .card-thumb-img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+
+    .card-thumb-icon {
+      font-size: 36px;
+      color: #111;
+    }
+
+    .card-play-icon {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      width: 50px;
+      height: 38px;
+      border-radius: 12px;
+      background-color: rgba(0,0,0,0.65);
+      color: white;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 18px;
+    }
+
+    @media (max-width: 576px) {
+      .card-main-area {
+        flex-direction: column;
+        min-height: auto;
+      }
+
+      .card-thumb-area {
+        width: 100%;
+        height: 150px;
+        margin-top: 8px;
+      }
+    }
+
+    .link-preview-area {
+      height: 110px;
+      padding: 16px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 14px;
+      border-radius: 18px 18px 0 0;
+      overflow: hidden;
+    }
+
+    .link-preview-text {
+      flex: 1;
+      min-width: 0;
+    }
+
+    .link-preview-title {
+      font-weight: 700;
+      font-size: 18px;
+      margin-bottom: 6px;
+      color: #1f2933;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .link-preview-note {
+      font-size: 15px;
+      color: #777;
+      margin-bottom: 6px;
+      display: -webkit-box;
+      -webkit-line-clamp: 1;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
+    }
+
+    .link-preview-domain {
+      font-size: 14px;
+      color: #777;
+    }
+
+    .link-preview-thumb {
+      width: 92px;
+      height: 72px;
+      border-radius: 12px;
+      object-fit: cover;
+      flex-shrink: 0;
+      background-color: rgba(255,255,255,0.5);
+    }
+
+    .link-preview-icon-box {
+      width: 92px;
+      height: 72px;
+      border-radius: 12px;
+      background-color: rgba(255,255,255,0.55);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 30px;
+      flex-shrink: 0;
+    }
+
+    .mini-play-icon {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      width: 38px;
+      height: 28px;
+      border-radius: 8px;
+      background-color: rgba(0,0,0,0.65);
+      color: white;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 14px;
+    }
+
+    .thumb-wrapper {
+      position: relative;
+      width: 92px;
+      height: 72px;
+      flex-shrink: 0;
+    }
+
+    @media (max-width: 576px) {
+      .link-preview-area {
+        height: auto;
+        min-height: 100px;
+        padding: 14px;
+      }
+
+      .link-preview-title {
+        font-size: 16px;
+      }
+
+      .link-preview-thumb,
+      .link-preview-icon-box,
+      .thumb-wrapper {
+        width: 82px;
+        height: 64px;
+      }
+    }
+
     .filter-row {
       display: flex;
       align-items: flex-start;
@@ -865,55 +1049,60 @@
 
         if (youtubeId) {
           previewContent = `
-            <div class="youtube-preview">
+            <div class="card-thumb-area">
               <img 
                 src="https://img.youtube.com/vi/${youtubeId}/hqdefault.jpg" 
-                class="youtube-thumb"
+                class="card-thumb-img"
                 alt="${item.title}">
-              <div class="youtube-play-icon">
+              <div class="card-play-icon">
                 <i class="fa-solid fa-play"></i>
               </div>
             </div>
           `;
         } else {
-        previewContent = `
-          <i class="fa-solid ${style.icon}"></i>
-        `;
+          previewContent = `
+            <div class="card-thumb-area" style="background-color: ${style.bg};">
+              <i class="fa-solid ${style.icon} card-thumb-icon"></i>
+            </div>
+          `;
         }
 
         card.innerHTML = `
           <div class="preview-card h-100">
-            <div class="preview-area" style="background-color: ${style.bg};">
+
+            <div class="card-main-area">
+
+              <div class="card-info-area">
+                <div class="d-flex justify-content-between align-items-start mb-2">
+                  <span 
+                    class="category-pill" 
+                    style="background-color: ${style.pillBg}; color: ${style.pillColor};">
+                    <i class="fa-solid ${style.icon} me-1"></i>${item.category}
+                  </span>
+
+                  <i 
+                    class="fa-solid fa-star ${item.favorit/e ? "favorite-icon" : "not-favorite-icon"}" 
+                    onclick="toggleFavorite(${item.id})">
+                  </i>
+                </div>
+
+                <h5 class="fw-bold mb-2">${item.platform} — ${item.title}</h5>
+
+                <p class="note-text mb-2">
+                  ${item.note || "沒有備註"}
+                </p>
+
+                <div class="mb-2">
+                  ${item.tags.map(tag => `<span class="badge rounded-pill text-bg-light me-1">#${tag}</span>`).join("")}
+                </div>
+
+                <p class="domain-text mb-0">
+                  <i class="fa-solid fa-link me-1"></i>${domain}
+                </p>
+              </div>
+
               ${previewContent}
-            </div>
 
-            <div class="preview-body">
-              <div class="d-flex justify-content-between align-items-start">
-                <span 
-                  class="category-pill" 
-                  style="background-color: ${style.pillBg}; color: ${style.pillColor};">
-                  <i class="fa-solid ${style.icon} me-1"></i>${item.category}
-                </span>
-
-                <i 
-                  class="fa-solid fa-star ${item.favorite ? "favorite-icon" : "not-favorite-icon"}" 
-                  onclick="toggleFavorite(${item.id})">
-                </i>
-              </div>
-
-              <h5 class="fw-bold mb-2">${item.platform} — ${item.title}</h5>
-
-              <p class="note-text mb-2">
-                ${item.note || "沒有備註"}
-              </p>
-
-              <div class="mb-2">
-                ${item.tags.map(tag => `<span class="badge rounded-pill text-bg-light me-1">#${tag}</span>`).join("")}
-              </div>
-
-              <p class="domain-text mb-0">
-                <i class="fa-solid fa-link me-1"></i>${domain}
-              </p>
             </div>
 
             <div class="preview-footer">
@@ -926,6 +1115,7 @@
                 <i class="fa-regular fa-trash-can delete-icon" onclick="deleteBookmark(${item.id})"></i>
               </div>
             </div>
+
           </div>
         `;
 
